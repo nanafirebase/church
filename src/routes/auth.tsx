@@ -3,13 +3,13 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, BookOpen, Loader2, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/auth")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Sign in — Unfold Jesus" },
@@ -20,7 +20,11 @@ export const Route = createFileRoute("/auth")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: () => ({ mode: ("signin" as "signin" | "signup" | "forgot") as unknown }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = typeof search.mode === "string" ? search.mode : "signin";
+    const mode = raw === "signup" || raw === "forgot" ? raw : "signin";
+    return { mode };
+  },
   component: AuthPage,
 });
 
@@ -30,9 +34,7 @@ type Method = "email" | "phone";
 function AuthPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
-  const initialMode: Mode = typeof search.mode === "string" && ["signin", "signup", "forgot"].includes(search.mode) ? (search.mode as Mode) : "signin";
-
-  const [mode, setMode] = useState<Mode>(initialMode);
+  const [mode, setMode] = useState<Mode>(search.mode);
   const [method, setMethod] = useState<Method>("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -116,6 +118,7 @@ function AuthPage() {
   };
 
   const google = async () => {
+    const { lovable } = await import("@/integrations/lovable");
     const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
     if (r.error) toast.error("Google sign-in failed");
   };
