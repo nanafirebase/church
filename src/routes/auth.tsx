@@ -19,6 +19,7 @@ export const Route = createFileRoute("/auth")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: () => ({ mode: ("signin" as "signin" | "signup" | "forgot") as unknown }),
   component: AuthPage,
 });
 
@@ -26,7 +27,8 @@ type Mode = "signin" | "signup" | "forgot";
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<Mode>("signin");
+  const search = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(typeof search.mode === "string" && ["signin", "signup", "forgot"].includes(search.mode) ? (search.mode as Mode) : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -35,7 +37,6 @@ function AuthPage() {
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { if (data.session) navigate({ to: "/feed" }); });
     const { data } = supabase.auth.onAuthStateChange((e, s) => { if (s && e === "SIGNED_IN") navigate({ to: "/feed" }); });
     return () => data.subscription.unsubscribe();
   }, [navigate]);

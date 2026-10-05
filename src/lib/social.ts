@@ -1,6 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Profile = {
@@ -29,20 +27,6 @@ export const POST_SELECT =
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const db = supabase as any;
-
-export function useSession() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setReady(true);
-    });
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
-    return () => data.subscription.unsubscribe();
-  }, []);
-  return { session, user: session?.user ?? null, ready };
-}
 
 export function useMyProfile(userId: string | undefined) {
   return useQuery({

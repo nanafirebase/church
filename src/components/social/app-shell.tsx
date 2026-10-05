@@ -1,21 +1,16 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Home, LogOut, User, Users } from "lucide-react";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useMyProfile, useSession } from "@/lib/social";
+import { useMyProfile } from "@/lib/social";
 import { UserAvatar } from "./user-avatar";
 import { Button } from "@/components/ui/button";
 
-export function AppShell({ children }: { children: ReactNode }) {
-  const { user } = useSession();
-  const { data: me } = useMyProfile(user?.id);
-  const qc = useQueryClient();
+export function AppShell({ children, user }: { children: ReactNode; user: { id: string } }) {
+  const { data: me } = useMyProfile(user.id);
   const navigate = useNavigate();
 
   const signOut = async () => {
-    await qc.cancelQueries();
-    qc.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };

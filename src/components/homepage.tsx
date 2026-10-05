@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Bookmark,
@@ -51,7 +52,7 @@ export function Homepage() {
       setPromptStatus("Start with the question on your mind.");
       return;
     }
-    setPromptStatus("Your question is ready. Sign in will be available when community accounts launch.");
+    setPromptStatus("Your question is ready. Sign in to share it with the community.");
   };
 
   return (
@@ -69,8 +70,13 @@ export function Homepage() {
             <a className="transition-colors hover:text-foreground" href="#explore">Explore</a>
             <a className="transition-colors hover:text-foreground" href="#featured">Featured</a>
             <a className="transition-colors hover:text-foreground" href="#community">Community</a>
-            <Button asChild size="lg"><a href="#ask">Ask a question <ArrowRight /></a></Button>
+            <Button asChild variant="ghost" size="lg"><Link to="/auth">Sign in</Link></Button>
+            <Button asChild size="lg"><Link to="/auth?mode=signup">Get started <ArrowRight /></Link></Button>
           </nav>
+
+          <div className="hidden items-center gap-2 md:hidden">
+            <Button asChild variant="ghost" size="sm"><Link to="/auth">Sign in</Link></Button>
+          </div>
 
           <Button
             className="md:hidden"
@@ -84,13 +90,17 @@ export function Homepage() {
           </Button>
         </div>
         {menuOpen && (
-          <nav className="border-t border-border bg-background px-4 py-4 md:hidden" aria-label="Mobile navigation">
+            <nav className="border-t border-border bg-background px-4 py-4 md:hidden" aria-label="Mobile navigation">
             <div className="mx-auto grid max-w-7xl gap-1">
               {[['Explore', '#explore'], ['Featured', '#featured'], ['Community', '#community']].map(([label, href]) => (
                 <a key={label} href={href} onClick={() => setMenuOpen(false)} className="flex min-h-11 items-center justify-between rounded-md px-3 text-sm font-medium hover:bg-muted">
                   {label}<ChevronRight className="size-4 text-muted-foreground" />
                 </a>
               ))}
+              <div className="mt-2 flex gap-2">
+                <Button asChild variant="outline" className="flex-1" size="lg"><Link to="/auth">Sign in</Link></Button>
+                <Button asChild className="flex-1" size="lg"><Link to="/auth?mode=signup">Get started</Link></Button>
+              </div>
             </div>
           </nav>
         )}
@@ -137,7 +147,12 @@ export function Homepage() {
                   <Button size="sm" onClick={submitQuestion}>Ask <Send /></Button>
                 </div>
               </div>
-              <p id="question-status" aria-live="polite" className="mt-3 min-h-5 text-sm text-muted-foreground">{promptStatus || "You can choose to post anonymously after signing in."}</p>
+              <p id="question-status" aria-live="polite" className="mt-3 min-h-5 text-sm text-muted-foreground">
+                {promptStatus || "You can choose to post anonymously after signing in."}
+                {promptStatus.includes("Sign in") && (
+                  <Link to="/auth" className="ml-1 font-semibold text-primary hover:underline">Sign in to post</Link>
+                )}
+              </p>
             </div>
           </div>
         </section>
@@ -236,7 +251,7 @@ export function Homepage() {
             <span className="mx-auto grid size-12 place-items-center rounded-full bg-support-soft text-support"><BookOpen /></span>
             <h2 className="mt-6 font-display text-4xl font-semibold sm:text-5xl">Questions can be the beginning of deeper faith.</h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">Ask honestly. Read carefully. Make room for understanding—and for one another.</p>
-            <Button asChild className="mt-8" size="lg"><a href="#ask">Ask your question <ArrowRight /></a></Button>
+            <Button asChild className="mt-8" size="lg"><Link to="/auth?mode=signup">Join the community <ArrowRight /></Link></Button>
           </div>
         </section>
       </main>
