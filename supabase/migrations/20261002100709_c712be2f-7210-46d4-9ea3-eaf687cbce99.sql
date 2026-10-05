@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+CREATE POLICY "avatar read signed in" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'avatars');
